@@ -1,0 +1,22 @@
+import asyncio
+import httpx
+import time
+
+async def send_request(url, data):
+    async with httpx.AsyncClient() as client:
+        start_time = time.time()
+        response = await client.post(url, json=data)
+        response_time = time.time() - start_time
+        return response.status_code, response_time
+
+async def main():
+    url = "http://localhost:8000/your-endpoint"  # Update with your actual endpoint
+    data = {"key": "value"}  # Replace with the data you need to send
+    tasks = [send_request(url, data) for _ in range(50)]
+    responses = await asyncio.gather(*tasks)
+
+    for i, (status, response_time) in enumerate(responses, start=1):
+        print(f"Request {i}: Status {status}, Response Time {response_time:.2f} seconds")
+
+if __name__ == "__main__":
+    asyncio.run(main())
