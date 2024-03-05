@@ -5,3 +5,22 @@ I hope this message finds you well. I am reaching out to seek clarification and 
 Facet Queries on Sharded Collections: We are considering leveraging Atlas Search's facet queries over sharded collections to enhance our application's search capabilities. However, we noted in the documentation Atlas Search Facet Over Sharded Collections a requirement that the cluster must run MongoDB v6.0 or higher for such queries. Additionally, it mentions that on sharded Atlas clusters running MongoDB v7.2.0, $searchMeta might return an error for facet queries. Could you provide further insights into this limitation and any best practices or workarounds you recommend? Our goal is to implement efficient and reliable facet search functionality in our sharded environment.
 
 Use of renameCollection() for Nightly Batch Loads: We are exploring the use of renameCollection() for swapping tables as part of our nightly batch load process. Our primary concern is the atomicity of this operation and whether there might be an intermediate state during the rename process where the collection is not accessible, potentially affecting our application's availability. Could you confirm if the renameCollection() operation is atomic and if there are any accessibility concerns we should be aware of? Additionally, any advice on best practices for using renameCollection() in such a scenario would be greatly appreciated.
+
+
+
+
+The process we envision is as follows:
+
+a. Populate a new collection (new_data_collection) with the latest data during the night.
+
+b. Once the new collection is fully prepared and indexed, use renameCollection() to atomically replace the existing collection (current_data_collection) with new_data_collection. The intended command sequence is to rename current_data_collection to backup_data_collection (for rollback capabilities) and subsequently rename new_data_collection to current_data_collection.
+
+c. This swap allows our application to immediately start using the updated data with minimal downtime or service interruption.
+
+Our primary concerns with this approach are:
+
+Atomicity: We seek confirmation on whether the renameCollection() operation is atomic from the perspective of client applications. Specifically, is there any moment during the rename process where current_data_collection would be unavailable to client queries?
+
+Accessibility: Related to atomicity, we are interested in understanding if there is an intermediate state during the swapping process where neither the old nor the new collection is accessible, potentially leading to query errors or downtime.
+
+Best Practices: Any recommendations or best practices for implementing this process, especially considerations for minimizing impact on application availability and ensuring a smooth transition between collections.
