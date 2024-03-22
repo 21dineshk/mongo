@@ -24,3 +24,31 @@ Atomicity: We seek confirmation on whether the renameCollection() operation is a
 Accessibility: Related to atomicity, we are interested in understanding if there is an intermediate state during the swapping process where neither the old nor the new collection is accessible, potentially leading to query errors or downtime.
 
 Best Practices: Any recommendations or best practices for implementing this process, especially considerations for minimizing impact on application availability and ensuring a smooth transition between collections.
+
+
+
+
+
+
+
+Dear MongoDB Support Team,
+
+I hope this message finds you well. I am reaching out to inquire about the capabilities of MongoDB Atlas Search, specifically regarding the management and analysis of index objects within Atlas Search indexes.
+
+My application involves a significant amount of data, and I am concerned about staying within the known limitations for index objects in Atlas Search indexes. To give you a clear picture, here's an overview of the data structure and volume I am working with:
+
+Households: 10 million
+Stores: 2
+Offers: 500 for each household
+Categories, Events, OfferTypes: 30 each
+Total Documents: Approximately 5 billion
+I understand from the documentation that Atlas Search does not support indexing more than two billion index objects, with the definition of an index object extending beyond top-level documents to include embedded documents and other indexable fields. Given my application's scale, I am concerned about inadvertently exceeding this limit and facing issues with index failure or degraded performance.
+
+Could you please provide guidance or tools within MongoDB Atlas that can help me:
+
+Determine the current count of index objects for my Atlas Search indexes?
+Monitor the count of index objects over time to prevent exceeding the limit?
+Strategize on best practices for structuring my data and indexes to stay within safe operational limits?
+Your insights and suggestions will be incredibly valuable as I plan the scalability and performance optimization of my application. I am keen to ensure that my usage of Atlas Search aligns with best practices and the technical limitations of the platform.
+
+Thank you very much for your time and assistance. I look forward to your response.
