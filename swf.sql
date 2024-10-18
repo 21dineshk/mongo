@@ -20,6 +20,40 @@ AND [PS_CUSTOMER_SELECTED_SUBSTITUTION_RANK].ORDERED_UPC_ID = RankedData.ORDERED
 
 
 
+WITH recent_segments AS (
+    SELECT 
+        household_id,
+        aiq_segment_nm,
+        CMP_NAME,
+        CMP_ID,
+        EXPORT_TS,
+        ROW_NUMBER() OVER (PARTITION BY household_id ORDER BY EXPORT_TS DESC) AS row_num
+    FROM 
+        gcp-abs-udco-bqvw-prod-prj-01.udco_ds_cust.RETAIL_CUSTOMER_BACKFEED_ACTIVATION
+    WHERE 
+        DW_CURRENT_VERSION_IND = TRUE 
+        AND CMP_NAME = 'PZN_THANKSGIVING_2024'
+)
+SELECT
+    household_id,
+    MAX(CASE 
+        WHEN aiq_segment_nm LIKE '%PERSONA%' THEN aiq_segment_nm
+        ELSE NULL
+    END) AS persona,
+    MAX(CASE 
+        WHEN aiq_segment_nm NOT LIKE '%PERSONA%' THEN aiq_segment_nm
+        ELSE NULL
+    END) AS buyerSegment
+FROM 
+    recent_segments
+WHERE 
+    row_num = 1
+GROUP BY 
+    household_id
+ORDER BY 
+    household_id;
+
+
 
 
 
