@@ -33,26 +33,42 @@ WITH recent_segments AS (
     WHERE 
         DW_CURRENT_VERSION_IND = TRUE 
         AND CMP_NAME = 'PZN_THANKSGIVING_2024'
+),
+persona_segments AS (
+    SELECT 
+        household_id,
+        aiq_segment_nm AS persona,
+        ROW_NUMBER() OVER (PARTITION BY household_id ORDER BY EXPORT_TS DESC) AS row_num_persona
+    FROM 
+        recent_segments
+    WHERE 
+        aiq_segment_nm LIKE '%PERSONA%'
+),
+buyer_segments AS (
+    SELECT 
+        household_id,
+        aiq_segment_nm AS buyerSegment,
+        ROW_NUMBER() OVER (PARTITION BY household_id ORDER BY EXPORT_TS DESC) AS row_num_buyerSegment
+    FROM 
+        recent_segments
+    WHERE 
+        aiq_segment_nm NOT LIKE '%PERSONA%'
 )
-SELECT
-    household_id,
-    MAX(CASE 
-        WHEN aiq_segment_nm LIKE '%PERSONA%' THEN aiq_segment_nm
-        ELSE NULL
-    END) AS persona,
-    MAX(CASE 
-        WHEN aiq_segment_nm NOT LIKE '%PERSONA%' THEN aiq_segment_nm
-        ELSE NULL
-    END) AS buyerSegment
+SELECT 
+    p.household_id,
+    p.persona,
+    b.buyerSegment
 FROM 
-    recent_segments
+    persona_segments p
+FULL OUTER JOIN 
+    buyer_segments b
+ON 
+    p.household_id = b.household_id
 WHERE 
-    row_num = 1
-GROUP BY 
-    household_id
+    (p.row_num_persona = 1 OR p.row_num_persona IS NULL) AND
+    (b.row_num_buyerSegment = 1 OR b.row_num_buyerSegment IS NULL)
 ORDER BY 
     household_id;
-
 
 
 
