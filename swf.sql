@@ -71,6 +71,53 @@ ORDER BY
     household_id;
 
 
+persona_list = [
+    'PZN_THANKSGIVING_2024_PERSONA_5',
+    'PZN_THANKSGIVING_2024_PERSONA_4',
+    'PZN_THANKSGIVING_2024_PERSONA_3',
+    'PZN_THANKSGIVING_2024_PERSONA_2',
+    'PZN_THANKSGIVING_2024_PERSONA_1',
+    'PZN_THANKSGIVING_2024_NO_PERSONA'
+]
+
+buyer_segment_list = [
+    'PZN_THANKSGIVING_2024_NO_TURKEY',
+    'PZN_THANKSGIVING_2024_TURKEY',
+    'PZN_THANKSGIVING_2024_VEGETARIAN',
+    'PZN_THANKSGIVING_2024_MEAT_SEAFOOD',
+    'PZN_THANKSGIVING_2024_SEAFOOD'
+]
+
+persona_str = ', '.join([f"'{segment}'" for segment in persona_list])
+buyer_segment_str = ', '.join([f"'{segment}'" for segment in buyer_segment_list])
+
+# SQL query with dynamic lists
+query = f"""
+WITH segment_data AS (
+    SELECT 
+        household_id,
+        ARRAY_AGG(aiq_segment_nm ORDER BY EXPORT_TS DESC) AS segments
+    FROM 
+        gcp-abs-udco-bqvw-prod-prj-01.udco_ds_cust.RETAIL_CUSTOMER_BACKFEED_ACTIVATION
+    WHERE 
+        DW_CURRENT_VERSION_IND = TRUE 
+        AND CMP_NAME = 'PZN_THANKSGIVING_2024'
+    GROUP BY 
+        household_id
+)
+SELECT
+    household_id,
+    (SELECT segment FROM UNNEST(segments) AS segment 
+        WHERE segment IN ({persona_str})
+        LIMIT 1) AS persona,
+    (SELECT segment FROM UNNEST(segments) AS segment 
+        WHERE segment IN ({buyer_segment_str})
+        LIMIT 1) AS buyerSegment
+FROM 
+    segment_data;
+"""
+
+
 
 
 WITH ranked_categories AS (
