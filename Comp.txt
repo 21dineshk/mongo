@@ -1,0 +1,93 @@
+1. Flat Format (One row per neighbor)
+
+Structure:
+420M rows in table, each row = one neighbor
+
+Pros:
+	•	Native SQL access; very fast with proper indexing
+	•	Perfect for filtering/analytics at DB level
+	•	Easy updates/inserts/deletes per row
+	•	pandas .read_sql() works out of the box
+
+Cons:
+	•	1000-row scan per request (minor if indexed)
+	•	Table is large (420M rows)
+	•	Slightly more storage (one row per neighbor)
+	•	Higher memory and concurrency pressure under heavy load
+
+Latency: 3–5 ms (index seek + 1000-row stream)
+Storage: Medium
+Scalability: Excellent
+Pandas-friendliness: Native
+
+⸻
+
+2. JSON Format (1 row per original_bpn, storing full JSON string)
+
+Structure:
+420K rows, each row is a JSON string with 1000 items
+
+Pros:
+	•	One-row read (fast seek)
+	•	JSON is queryable in SQL Server (with OPENJSON)
+	•	Semi-human readable
+
+Cons:
+	•	Large JSON strings (~70–90 KB per row)
+	•	Repeats keys = ~30% more storage
+	•	Parsing to pandas is slower (json.loads())
+	•	Updates require rewriting whole JSON blob
+	•	Can hit string length/serialization limits under pressure
+
+Latency: 6–9 ms
+Storage: Large
+Scalability: Moderate
+Pandas-friendliness: OK (slower)
+
+⸻
+
+3. Delimited Format (1 row per original_bpn, pipe/newline-separated)
+
+Structure:
+420K rows, each row is a multi-line delimited string
+
+Pros:
+	•	One-row read
+	•	No key repetition → compact (~30–50 KB)
+	•	Fastest deserialization to pandas (split()-based)
+	•	Human-readable
+	•	No complex tooling (plain SQL + pandas)
+
+Cons:
+	•	Requires format contract (schema awareness)
+	•	Harder to query inside SQL (vs flat format)
+	•	Minor parsing cost in app layer
+
+Latency: 3–6 ms
+Storage: Compact
+Scalability: Excellent
+Pandas-friendliness: Excellent
+
+⸻
+
+4. Compressed Format (Parquet/Pickle stored in VARBINARY)
+
+Structure:
+420K rows, each row is a binary blob of compressed data
+
+Pros:
+	•	Smallest storage footprint (10–30 KB)
+	•	Fast pandas load (especially Parquet)
+	•	Clean schema enforcement
+	•	Good for storage or ML pipelines
+
+Cons:
+	•	Not human-readable
+	•	Not queryable in SQL
+	•	Adds CPU cost (serialize/deserialize)
+	•	App tightly coupled to format
+
+Latency: 7–12 ms (I/O + decode)
+Storage: Smallest
+Scalability: Great for storage, moderate for latency
+Pandas-friendliness: Excellent
