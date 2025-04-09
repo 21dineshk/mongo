@@ -1,0 +1,99 @@
+{
+  "contentType": "application/vnd.microsoft.card.adaptive",
+  "contentUrl": null,
+  "content": {
+    "type": "AdaptiveCard",
+    "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.5",
+    "msteams": {
+      "width": "Full"
+    },
+    "body": [
+      {
+        "type": "ColumnSet",
+        "columns": [
+          {
+            "type": "Column",
+            "width": "auto",
+            "items": [
+              {
+                "type": "Image",
+                "url": "${icon}",
+                "size": "Small",
+                "style": "Person"
+              }
+            ]
+          },
+          {
+            "type": "Column",
+            "width": "stretch",
+            "items": [
+              {
+                "type": "TextBlock",
+                "text": "${title}",
+                "weight": "Bolder",
+                "size": "ExtraLarge",
+                "wrap": true
+              }
+            ],
+            "verticalContentAlignment": "Center"
+          }
+        ]
+      },
+      {
+        "type": "TextBlock",
+        "text": "${description}",
+        "wrap": true,
+        "weight": "Bolder",
+        "size": "Medium",
+        "color": "Accent"
+      },
+
+      // Each row becomes a ColumnSet
+      {
+        "type": "TextBlock",
+        "text": "**Experiments Scheduled in 5 Days**",
+        "wrap": true,
+        "spacing": "Medium"
+      },
+
+      {
+        "type": "ColumnSet",
+        "columns": [
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "System", "weight": "Bolder", "wrap": true }] },
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "Status", "weight": "Bolder", "wrap": true }] },
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "Exp Name", "weight": "Bolder", "wrap": true }] },
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "Start", "weight": "Bolder", "wrap": true }] },
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "End", "weight": "Bolder", "wrap": true }] }
+        ]
+      },
+
+      // Repeat this block for each experiment
+      {
+        "type": "ColumnSet",
+        "columns": [
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "MSG", "wrap": true }] },
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "Live", "wrap": true }] },
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "Test Exp", "wrap": true }] },
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "2025-04-09", "wrap": true }] },
+          { "type": "Column", "width": "stretch", "items": [{ "type": "TextBlock", "text": "2025-04-12", "wrap": true }] }
+        ]
+      },
+
+      // ... Add more rows above using same ColumnSet structure ...
+
+      {
+        "type": "ActionSet",
+        "horizontalAlignment": "Right",
+        "actions": [
+          {
+            "type": "Action.OpenUrl",
+            "title": "Open XER",
+            "url": "https://spotlight.albertsons.com/",
+            "iconUrl": "Icon:Open"
+          }
+        ]
+      }
+    ]
+  }
+}
